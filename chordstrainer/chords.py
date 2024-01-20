@@ -1,6 +1,6 @@
 import re
 
-# https://github.com/AnthonyChiavelli/PyChordFinder/blob/master/ChordFinder.py
+# Heavily inspired by https://github.com/AnthonyChiavelli/PyChordFinder/blob/master/ChordFinder.py
 
 chr_scale = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 
@@ -24,6 +24,11 @@ chord_names = {
     "Add9": {"pattern": [0, 2, 4, 7], "abbrvs": ["add9"]},
 }
 
+all_names = list(chord_names.keys())
+for chord, val in chord_names.items():
+    all_names.extend(val["abbrvs"])
+
+
 pattern_to_degree = {
     "0": "0",
     "1": "2b",
@@ -38,6 +43,18 @@ pattern_to_degree = {
     "10": "7b",
     "11": "7",
 }
+
+
+def gen_random_chord():
+    import random
+
+    root = random.choice(chr_scale)
+    chord = random.choice(all_names)
+    return root + chord
+
+
+# if __name__ == "__main__":
+#     print(gen_random_chord())
 
 
 def parse_notes(notes):
@@ -79,7 +96,6 @@ def parse_notes(notes):
 def parse_chord(chord_name):
     # returns a list of notes in the chord
     # e.g. "C Major" -> ["C", "E", "G"]
-    print(chord_name)
     root = chord_name.split(" ")[0]
     name = chord_name.split(" ")[1:]
     name = " ".join(name)
@@ -150,9 +166,10 @@ def find_chords(notes):
     chords_found = list(set(chords_found))
     abbrs = [get_abbrevs(chord) for chord in chords_found]
     degrees = [get_degrees(chord) for chord in chords_found]
-    if len(abbrs) > 0:
-        abbrs = abbrs[0]
-    if len(degrees) > 0:
-        degrees = degrees[0]
+
+    # if len(abbrs) > 0:
+    #     abbrs = abbrs[0]
+    # if len(degrees) > 0:
+    #     degrees = degrees[0]
 
     return chords_found, abbrs, degrees
