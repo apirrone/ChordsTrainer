@@ -4,6 +4,7 @@ from multiprocessing import Queue
 import pygame
 
 from chordstrainer.utils import BG_COLOR, TEXT_COLOR, Button
+from chordstrainer.chords import find_chords, gen_random_chord, is_same_chord
 
 pygame.display.init()
 pygame.font.init()
@@ -15,7 +16,6 @@ data_queue = Queue()
 def midi_process():
     import mido
 
-    from chordstrainer.chords import find_chords
 
     notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     min_note = 21
@@ -88,13 +88,50 @@ def display_chord(data, i=0):
         text = font.render(data["degrees"][i][chord_note], True, TEXT_COLOR)
         screen.blit(text, (3 + j * 30, 30))
 
+def train_mode(data, current_train_chord):
+    color = (255, 255, 0)
+    same_chord = False
+    if len(data["names"]) != 0:
+        same_chord = is_same_chord(data["names"][0], current_train_chord[0])
+        color = (0, 255, 0) if same_chord else (255, 0, 0)
+
+
+    # display main chord name in big in the middle
+    font = pygame.font.SysFont("Arial", 60)
+    text = font.render(current_train_chord[0], True, color)
+    screen.blit(
+        text,
+        (
+            window_size[0] // 2 - text.get_width() // 2,
+            window_size[1] // 2 - text.get_height() // 2,
+        ),
+    )
+
+
+    # DEBUG
+    # display main chord name in big in the middle
+
+    # if len(data["names"]) == 0:
+    #     return
+    # font = pygame.font.SysFont("Arial", 30)
+    # text = font.render(data["names"][0], True, TEXT_COLOR)
+    # screen.blit(
+    #     text,
+    #     (
+    #         window_size[0] // 3 - text.get_width() // 3,
+    #         window_size[1] // 3 - text.get_height() // 3,
+    #     ),
+    # )
+
+    return same_chord
+
 
 window_size = (600, 300)
 screen = pygame.display.set_mode(window_size, flags=pygame.SRCALPHA + pygame.NOFRAME)
 
 
 def main():
-    VIEW_MODE = True
+    VIEW_MODE = False
     multiprocessing.Process(target=midi_process).start()
     data = {"chord_notes": [], "names": [], "abbrs": [], "degrees": []}
 
@@ -103,12 +140,18 @@ def main():
     )
 
     alternate_chord = 0
+    current_train_chord = gen_random_chord() # tuple like ('FAdd9', 'F', [0, 4, 7]), abbr, root, pattern
+    next_train_chord = False
+
     while True:
         screen.fill(BG_COLOR)
 
         try:
             data = data_queue.get(False)
             alternate_chord = 0
+            if len(data["names"]) == 0 and next_train_chord:
+                current_train_chord = gen_random_chord()
+                next_train_chord = False
         except multiprocessing.queues.Empty:
             pass
 
@@ -116,7 +159,10 @@ def main():
         text = font.render(" ".join(data["chord_notes"]), True, TEXT_COLOR)
         screen.blit(text, (0, 0))
 
-        display_chord(data, i=alternate_chord)
+        if VIEW_MODE:
+            display_chord(data, i=alternate_chord)
+        else:
+            next_train_chord = train_mode(data, current_train_chord)
 
         # Press space to view alternate chord
         events = pygame.event.get()
@@ -139,13 +185,16 @@ def main():
                         )
 
         ret = train_mode_button.update(events)
+
         if ret:
             VIEW_MODE = not VIEW_MODE
+            current_train_chord = gen_random_chord()
+
         train_mode_button.draw(screen)
 
         if not VIEW_MODE:
             font = pygame.font.SysFont("Arial", 20)
-            text = font.render("TRAIN MODE", True, TEXT_COLOR)
-            screen.blit(text, (window_size[0] - text.get_width(), 0))
+            text = font.render("TRAIN MODE", True, (255, 255,0))
+            screen.blit(text, (0,window_size[1] - text.get_height()))
 
         pygame.display.flip()
