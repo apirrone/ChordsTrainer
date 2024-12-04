@@ -53,8 +53,8 @@ def gen_random_chord():
     return root + chord
 
 
-# if __name__ == "__main__":
-#     print(gen_random_chord())
+if __name__ == "__main__":
+    print(gen_random_chord())
 
 
 def parse_notes(notes):
@@ -171,5 +171,21 @@ def find_chords(notes):
     #     abbrs = abbrs[0]
     # if len(degrees) > 0:
     #     degrees = degrees[0]
+
+    # place in the first position the chord which the lowest note is the tonic. For ex :
+
+    # ['D# Major6', 'C Minor7']
+    # [{'D#': '0', 'G': '3', 'A#': '5', 'C': '6'}, {'C': '0', 'D#': '3b', 'G': '5', 'A#': '7b'}]
+    # ['C', 'G', 'A#', 'D#'] -> notes played from low to high. C is the lowest note, so C Minor7 should be first
+
+    first_chord_index = 0
+    for i, chord in enumerate(chords_found):
+        if notes[0] == chord[0]:
+            first_chord_index = i
+            break
+
+    chords_found = chords_found[first_chord_index:] + chords_found[:first_chord_index]
+    abbrs = abbrs[first_chord_index:] + abbrs[:first_chord_index]
+    degrees = degrees[first_chord_index:] + degrees[:first_chord_index]
 
     return chords_found, abbrs, degrees

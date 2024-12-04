@@ -21,7 +21,9 @@ def midi_process():
     min_note = 21
 
     pressed = {}
-    inport = mido.open_input("uMIDI/O22:uMIDI/O22 MIDI 1 20:0")
+    interfaces = mido.get_input_names()
+    # inport = mido.open_input("uMIDI/O22:uMIDI/O22 MIDI 1 20:0")
+    inport = mido.open_input(interfaces[1]) # TODO button to iterate over detected interfaces
     for msg in inport:
         if "note" not in msg.type:
             continue
