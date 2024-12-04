@@ -16,7 +16,7 @@ data_queue = Queue()
 def midi_process():
     import mido
 
-
+    # TODO handle flat notes
     notes = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
     min_note = 21
 
@@ -91,10 +91,10 @@ def display_chord(data, i=0):
 def train_mode(data, current_train_chord):
     color = (255, 255, 0)
     same_chord = False
+
     if len(data["names"]) != 0:
         same_chord = is_same_chord(data["names"][0], current_train_chord[0])
         color = (0, 255, 0) if same_chord else (255, 0, 0)
-
 
     # display main chord name in big in the middle
     font = pygame.font.SysFont("Arial", 60)
@@ -107,21 +107,32 @@ def train_mode(data, current_train_chord):
         ),
     )
 
+    # # display abbrs smaller below
+    # font = pygame.font.SysFont("Arial", 30)
+    # text = font.render(", ".join(data["abbrs"][i]), True, TEXT_COLOR)
+    # screen.blit(
+    #     text,
+    #     (
+    #         window_size[0] // 2 - text.get_width() // 2,
+    #         window_size[1] // 2 + 30 + text.get_height() // 2,
+    #     ),
+    # )
+
 
     # DEBUG
     # display main chord name in big in the middle
 
-    # if len(data["names"]) == 0:
-    #     return
-    # font = pygame.font.SysFont("Arial", 30)
-    # text = font.render(data["names"][0], True, TEXT_COLOR)
-    # screen.blit(
-    #     text,
-    #     (
-    #         window_size[0] // 3 - text.get_width() // 3,
-    #         window_size[1] // 3 - text.get_height() // 3,
-    #     ),
-    # )
+    if len(data["names"]) == 0:
+        return
+    font = pygame.font.SysFont("Arial", 30)
+    text = font.render(data["names"][0], True, TEXT_COLOR)
+    screen.blit(
+        text,
+        (
+            window_size[0] // 3 - text.get_width() // 3,
+            window_size[1] // 3 - text.get_height() // 3,
+        ),
+    )
 
     return same_chord
 
@@ -162,7 +173,9 @@ def main():
         if VIEW_MODE:
             display_chord(data, i=alternate_chord)
         else:
-            next_train_chord = train_mode(data, current_train_chord)
+            success = train_mode(data, current_train_chord)
+            if success:
+                next_train_chord = True
 
         # Press space to view alternate chord
         events = pygame.event.get()

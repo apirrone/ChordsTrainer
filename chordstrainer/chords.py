@@ -3,31 +3,52 @@ import random
 
 # Heavily inspired by https://github.com/AnthonyChiavelli/PyChordFinder/blob/master/ChordFinder.py
 
+# TODO handle flat notes
 chr_scale = ["A", "A#", "B", "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"]
 
 chord_names = {
     "Major": {"pattern": [0, 4, 7], "abbrvs": ["maj", "M", "Maj", "Δ"]},
     "Minor": {"pattern": [0, 3, 7], "abbrvs": ["min", "m", "Min", "-"]},
     "Major7": {"pattern": [0, 4, 7, 11], "abbrvs": ["maj7", "M7", "Maj7", "Δ7"]},
+    "Dominant7": {"pattern": [0, 4, 7, 10], "abbrvs": ["7"]},
+    "Minor7": {"pattern": [0, 3, 7, 10], "abbrvs": ["m7", "-7"]},
+    "Half-diminished7": {"pattern": [0, 3, 6, 10], "abbrvs": ["m7b5", "-7b5"]},
+    "Diminished7": {"pattern": [0, 3, 6, 9], "abbrvs": ["dim7", "°7"]},
+
+    "Major6": {"pattern": [0, 4, 7, 9], "abbrvs": ["M6", "6"]},
+    "Minor6": {"pattern": [0, 3, 7, 9], "abbrvs": ["m6", "-6"]},
     "Augmented": {"pattern": [0, 4, 8], "abbrvs": ["aug", "+"]},
     "Diminished": {"pattern": [0, 3, 6], "abbrvs": ["dim", "°"]},
-    "Diminished7": {"pattern": [0, 3, 6, 9], "abbrvs": ["dim7", "°7"]},
-    "Half-diminished7": {"pattern": [0, 3, 6, 10], "abbrvs": ["m7b5", "-7b5"]},
+
     "Minor-major7": {"pattern": [0, 3, 7, 11], "abbrvs": ["mM7", "-M7"]},
     "Augmented7": {"pattern": [0, 4, 8, 10], "abbrvs": ["+7"]},
     "Augmented major7": {"pattern": [0, 4, 8, 11], "abbrvs": ["+M7"]},
-    "Minor7": {"pattern": [0, 3, 7, 10], "abbrvs": ["m7", "-7"]},
-    "Major6": {"pattern": [0, 4, 7, 9], "abbrvs": ["M6", "6"]},
-    "Minor6": {"pattern": [0, 3, 7, 9], "abbrvs": ["m6", "-6"]},
-    "Dominant7": {"pattern": [0, 4, 7, 10], "abbrvs": ["7"]},
     "Sus2": {"pattern": [0, 2, 7], "abbrvs": ["sus2"]},
     "Sus4": {"pattern": [0, 5, 7], "abbrvs": ["sus4"]},
     "Add9": {"pattern": [0, 2, 4, 7], "abbrvs": ["add9"]},
 }
 
-all_names = list(chord_names.keys())
-for chord, val in chord_names.items():
-    all_names.extend(val["abbrvs"])
+difficulties = {
+    0: ["Major", "Minor", "Major7", "Dominant7", "Minor7", "Half-diminished7", "Diminished7"],
+    1: ["Major", "Minor", "Major7", "Dominant7", "Minor7", "Half-diminished7", "Diminished7", "Major6", "Minor6", "Augmented", "Diminished"],
+    2: ["Major", "Minor", "Major7", "Dominant7", "Minor7", "Half-diminished7", "Diminished7", "Major6", "Minor6", "Augmented", "Diminished", "Minor-major7", "Augmented7", "Augmented major7", "Sus2", "Sus4", "Add9"],
+}
+
+def get_chord_names(difficulty=0): # 3 levels ? 0, 1, 2
+    names = {}
+    for chord in difficulties[difficulty]:
+        names[chord] = chord_names[chord]
+
+    return names
+
+def get_all_names(difficulty=0): # 3 levels ? 0, 1, 2
+    chord_names = get_chord_names(difficulty)
+    all_names = list(chord_names.keys())
+    for chord, val in chord_names.items():
+        all_names.extend(val["abbrvs"])
+
+    return all_names
+
 
 
 def find_chord_from_abbr(abbr):
@@ -67,13 +88,13 @@ pattern_to_degree = {
 }
 
 
-def gen_random_chord():
+def gen_random_chord(difficulty=0):
     """
     Returns: chord name (random abbr), root, pattern
     """
 
     root = random.choice(chr_scale)
-    chord_abbr = random.choice(all_names)
+    chord_abbr = random.choice(get_all_names(difficulty))
     return root + " " + chord_abbr, root, find_chord_from_abbr(chord_abbr)[1]["pattern"]
 
 
