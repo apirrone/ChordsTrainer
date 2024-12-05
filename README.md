@@ -32,6 +32,10 @@ You can change the `TRAIN_DIFFICULTY` value in `__init__.py`, it's a number betw
 - [ ] Add a way to change the difficulty in the app
 - [ ] Include flat notes
 - [ ] Global code overhaul (very dirty right now)
+- [ ] Improve train mode
+  - [ ] Make "train sessions", with stats (reactivity, errors)
+  - [ ] Make a training program Anki style
+  - [ ] Identify chords inversions played, encourage variety
 
 
 ## Notes
