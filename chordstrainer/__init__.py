@@ -145,7 +145,8 @@ screen = pygame.display.set_mode(window_size, flags=pygame.SRCALPHA + pygame.NOF
 
 
 def main():
-    VIEW_MODE = False
+    VIEW_MODE = True
+    TRAIN_DIFFICULTY = 0
     multiprocessing.Process(target=midi_process).start()
     data = {"chord_notes": [], "names": [], "abbrs": [], "degrees": []}
 
@@ -154,7 +155,7 @@ def main():
     )
 
     alternate_chord = 0
-    current_train_chord = gen_random_chord() # tuple like ('FAdd9', 'F', [0, 4, 7]), abbr, root, pattern
+    current_train_chord = gen_random_chord(difficulty=TRAIN_DIFFICULTY) # tuple like ('FAdd9', 'F', [0, 4, 7]), abbr, root, pattern
     next_train_chord = False
 
     while True:
@@ -164,7 +165,7 @@ def main():
             data = data_queue.get(False)
             alternate_chord = 0
             if len(data["names"]) == 0 and next_train_chord:
-                current_train_chord = gen_random_chord()
+                current_train_chord = gen_random_chord(difficulty=TRAIN_DIFFICULTY)
                 next_train_chord = False
         except multiprocessing.queues.Empty:
             pass
@@ -204,7 +205,7 @@ def main():
 
         if ret:
             VIEW_MODE = not VIEW_MODE
-            current_train_chord = gen_random_chord()
+            current_train_chord = gen_random_chord(difficulty=TRAIN_DIFFICULTY)
 
         train_mode_button.draw(screen)
 

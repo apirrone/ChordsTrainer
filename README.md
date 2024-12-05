@@ -22,8 +22,21 @@ Then run:
 $ chords-trainer
 ```
 
+You can click on the `train mode` button to switch to train mode. In this mode, the app shows you a random chord, if you play the right chord it goes to a next one.
 
-## Message attributes
+You can change the `TRAIN_DIFFICULTY` value in `__init__.py`, it's a number between 0 and 2. 0 is easiest, 2 is hardest.
+
+
+## TODO
+- [ ] Add a way to select the midi interface (just a button to iterate over interfaces)
+- [ ] Add a way to change the difficulty in the app
+- [ ] Include flat notes
+- [ ] Global code overhaul (very dirty right now)
+
+
+## Notes
+
+### Message attributes
 - msg.type
 - msg.note
 - msg.velocity
