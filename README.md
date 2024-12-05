@@ -16,6 +16,8 @@ I'll add something to make it easier to select the relevant midi interface at so
 inport = mido.open_input(interfaces[1]) # This value (1)
 ```
 
+Then run:
+
 ```bash
 $ chords-trainer
 ```
