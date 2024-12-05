@@ -22,6 +22,9 @@ def midi_process():
 
     pressed = {}
     interfaces = mido.get_input_names()
+    print("Detected interfaces : ")
+    for i, interface in enumerate(interfaces):
+        print(f"{i} : {interface}")
     # inport = mido.open_input("uMIDI/O22:uMIDI/O22 MIDI 1 20:0")
     inport = mido.open_input(interfaces[1]) # TODO button to iterate over detected interfaces
     for msg in inport:
